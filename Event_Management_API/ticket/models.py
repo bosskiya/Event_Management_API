@@ -1,9 +1,20 @@
+import uuid
 from django.db import models
-from events.models import Event
+from django.conf import settings
+from django.utils import timezone
+from events.models import Event, TicketType
+from registrations.models import Registration
 
 
 class Ticket(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='tickets')
-    type = models.CharField(max_length=100)  # e.g., General, VIP
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    available = models.PositiveIntegerField()
+    registration = models.OneToOneField(Registration, on_delete=models.CASCADE, related_name="ticket")
+    code = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    issued_at = models.DateTimeField(auto_now_add=True)
+    is_checked_in = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Ticket {self.code} for {self.registration.event.title}"
+
+    def mark_checked_in(self):
+        self.is_checked_in = True
+        self.save(update_fields=["is_checked_in"])

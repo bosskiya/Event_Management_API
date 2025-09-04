@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from datetime import timedelta
 from .models import Registration
+from ticket.models import Ticket
 from notifications.tasks import send_registration_confirmation, send_event_reminder
 
 
@@ -11,6 +12,10 @@ def handle_registration_created(sender, instance: Registration, created, **kwarg
     """Send confirmation immediately + reminder before event."""
     if not created:
         return
+
+    # Create ticket if not waitlisted
+    if not instance.is_waitlisted:
+        Ticket.objects.create(registration=instance)
 
     # Send confirmation email right away
     send_registration_confirmation.delay(instance.user.email, instance.event.title)

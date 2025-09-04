@@ -1,9 +1,12 @@
 from rest_framework import serializers
 from .models import Registration
+from ticket.models import Ticket
+from ticket.serializers import TicketSerializer
 from events.models import Event, TicketType
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
+    ticket = TicketSerializer(read_only=True)
     user = serializers.ReadOnlyField(source="user.id")
     event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
     ticket_type = serializers.PrimaryKeyRelatedField(
@@ -13,16 +16,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Registration
-        fields = (
-            "id",
-            "user",
-            "event",
-            "event_title",
-            "ticket_type",
-            "registered_at",
-            "is_waitlisted",
-        )
-        read_only_fields = ("id", "registered_at", "is_waitlisted")
+        fields = ("id", "user", "event", "ticket_type", "registered_at", "is_waitlisted", "ticket")
+        read_only_fields = ("user", "registered_at", "is_waitlisted", "ticket")
 
     def validate(self, data):
         user = self.context["request"].user
