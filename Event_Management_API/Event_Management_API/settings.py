@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-le4=08+&y&vq%$l_g_my)&(u86-8)%grly2=t(qlg!7sa@xj1i'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "insecure")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -38,10 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "rest_framework",
+    "django_filters",
+    "drf_spectacular",
+
     'users',
     'events',
     'registrations',
     'notifications',
+    'ticket',
 ]
 
 MIDDLEWARE = [
@@ -79,8 +86,12 @@ WSGI_APPLICATION = 'Event_Management_API.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB", "event_management_api"),
+        "USER": os.getenv("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "bini"),
+        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 
@@ -126,4 +137,32 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Event Management API",
+    "DESCRIPTION": "API for managing events, registrations, ticketing, and schedules.",
+    "VERSION": "1.0.0",
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": False,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}

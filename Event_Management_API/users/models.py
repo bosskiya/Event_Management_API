@@ -2,5 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
-    is_organizer = models.BooleanField(default=False)
-    is_attendee = models.BooleanField(default=True)
+    class Roles(models.TextChoices):
+        ORGANIZER = "organizer", "Organizer"
+        ATTENDEE = "attendee", "Attendee"
+
+    role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.ATTENDEE)
+
+    def is_organizer(self):
+        return self.role == self.Roles.ORGANIZER
