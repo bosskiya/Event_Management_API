@@ -3,6 +3,12 @@ from .models import Event, Session, Speaker, TicketType, Category
 from django.utils import timezone
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id", "name", "slug")
+
+
 class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session

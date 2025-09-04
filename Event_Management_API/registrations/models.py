@@ -5,15 +5,9 @@ from events.models import Event, TicketType
 
 
 class Registration(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="registrations", on_delete=models.CASCADE
-    )
-    event = models.ForeignKey(
-        Event, related_name="registrations", on_delete=models.CASCADE
-    )
-    ticket_type = models.ForeignKey(
-        TicketType, related_name="registrations", on_delete=models.SET_NULL, null=True, blank=True
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="registrations", on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name="registrations", on_delete=models.CASCADE)
+    ticket_type = models.ForeignKey(TicketType, related_name="registrations", on_delete=models.SET_NULL, null=True, blank=True)
     registered_at = models.DateTimeField(auto_now_add=True)
     is_waitlisted = models.BooleanField(default=False)
 

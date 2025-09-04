@@ -1,8 +1,9 @@
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions, filters, viewsets, permissions
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Event
-from .serializers import EventSerializer
+from .models import Category
+from .serializers import EventSerializer, CategorySerializer
 
 
 class EventListView(generics.ListAPIView):
@@ -76,3 +77,9 @@ class EventDeleteView(generics.DestroyAPIView):
         if instance.organizer != self.request.user:
             raise PermissionError("You can only delete your own events.")
         instance.delete()
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

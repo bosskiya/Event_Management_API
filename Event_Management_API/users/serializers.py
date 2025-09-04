@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("id", "username", "email", "first_name", "last_name", "role", "password")
         extra_kwargs = {"email": {"required": True}}
+        read_only_fields = ("id",)
 
     def create(self, validated_data):
         password = validated_data.pop("password")
