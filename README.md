@@ -116,6 +116,7 @@
             "last_name":"Doe",
             "role":"attendee"
         }
+
 🎫 Events & Categories
 1. *List Categories
     - *GET* /api/events/categories/
