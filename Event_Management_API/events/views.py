@@ -54,6 +54,7 @@ class EventUpdateView(generics.UpdateAPIView):
     """
     Organizers can update their own events.
     """
+    http_method_names = ["get", "put", "patch"]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]
